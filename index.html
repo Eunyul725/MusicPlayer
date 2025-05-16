@@ -317,9 +317,17 @@
                 }
             });
         });
-        volumeBtn.addEventListener('click', ()=> {
+        volumeBtn.addEventListener('click', (e)=> {
+            e.stopPropagation();
             volumeCtrl.classList.toggle('active');
             volumeBtn.classList.toggle('active');
+        });
+        volumeCtrl.addEventListener('click', (e)=> {
+            e.stopPropagation(); 
+        });
+        window.addEventListener('click', () => {
+            volumeCtrl.classList.remove('active');
+            volumeBtn.classList.remove('active');
         });
 
         volumeRange.addEventListener('input', () => {
@@ -337,13 +345,7 @@
                 volumeBtn.setAttribute('title', '큰 볼륨');
             }
         });
-        document.addEventListener('click', (e) => {
-            // volume_ctrl이나 volumeBtn을 클릭한 경우는 제외
-            if (!e.target.closest('#volume_ctrl') && !e.target.closest('#volumeBtn')) {
-                volumeCtrl.classList.remove('active');
-                volumeBtn.classList.remove('active');
-            }
-        });
+        
     </script>
 </body>
 </html>;
