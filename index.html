@@ -161,7 +161,7 @@
         const prevBtn = musicApp.querySelector('#prevBtn');
         const nextBtn = musicApp.querySelector('#nextBtn');
         let list_index = 0;
-
+        
         const musicPlay = ()=> {
             musicAudio.play();
             playBtn.innerHTML = "pause";
@@ -201,8 +201,6 @@
         });
         
         musicAudio.addEventListener('timeupdate', (e)=> {
-            if (musicAudio.paused) return;
-
             let current = e.target.currentTime;
             let duration = e.target.duration;
             let progressRatio = ( current/duration ) * 100;
@@ -265,21 +263,6 @@
         listBtn.addEventListener('click', ()=>{
             listBox.classList.toggle('active');
         });
-
-        const loadMusic = (num) => {
-            musicAudio.src = `./songs/${ musicList[num].audio }.mp3`;
-            albumImg.src = `./images/${ musicList[num].img}.jpg`;
-            musicName.innerHTML = musicList[num].name;
-            artistName.innerHTML = musicList[num].artist;
-            totalTime.innerHTML = musicList[num].total;
-
-            const allList = listBox.querySelectorAll('ul li');
-            allList.forEach(listItem => listItem.classList.remove('on'));
-            if (allList[num]) {
-                allList[num].classList.add('on');
-            }
-        };
-
         const fragment = document.createDocumentFragment();     //가상 DOM개체
         const listLoad = () =>{
             musicList.forEach( (music) => {
@@ -306,6 +289,19 @@
         }
         listLoad();
         
+        const loadMusic = (num) => {
+            musicAudio.src = `./songs/${ musicList[num].audio }.mp3`;
+            albumImg.src = `./images/${ musicList[num].img}.jpg`;
+            musicName.innerHTML = musicList[num].name;
+            artistName.innerHTML = musicList[num].artist;
+            totalTime.innerHTML = musicList[num].total;
+
+            const allList = listBox.querySelectorAll('ul li');
+            allList.forEach(listItem => listItem.classList.remove('on'));
+            allList[num].classList.add('on');
+        }
+        loadMusic(list_index);
+        
         /* 볼륨 조절 컨트롤 */
         const volumeBtn = document.querySelector('#volumeBtn');
         const volumeCtrl = document.querySelector('#volume_ctrl');
@@ -321,17 +317,9 @@
                 }
             });
         });
-        volumeBtn.addEventListener('click', (e)=> {
-            e.stopPropagation();
+        volumeBtn.addEventListener('click', ()=> {
             volumeCtrl.classList.toggle('active');
             volumeBtn.classList.toggle('active');
-        });
-        volumeCtrl.addEventListener('click', (e)=> {
-            e.stopPropagation(); 
-        });
-        window.addEventListener('click', () => {
-            volumeCtrl.classList.remove('active');
-            volumeBtn.classList.remove('active');
         });
 
         volumeRange.addEventListener('input', () => {
@@ -349,7 +337,13 @@
                 volumeBtn.setAttribute('title', '큰 볼륨');
             }
         });
-
+        document.addEventListener('click', (e) => {
+            // volume_ctrl이나 volumeBtn을 클릭한 경우는 제외
+            if (!e.target.closest('#volume_ctrl') && !e.target.closest('#volumeBtn')) {
+                volumeCtrl.classList.remove('active');
+                volumeBtn.classList.remove('active');
+            }
+        });
     </script>
 </body>
 </html>;
