@@ -9,23 +9,22 @@
     <style>
         body, div, h2, p, ul, li{ margin: 0; padding: 0; box-sizing: border-box; }
         :root{
-            --pink : #ff74a4;
-            --violet : #9f6ea3;
+            --mint : #c7f0db;
+            --blue : #a0cfff;
             --white : #fff;
             --lightshadow : rgba(0,0,0,0.15);
-            --pinkshadow : #ffcbdd;
             --darkwhite : #cecaca;
-            --color-red : #ae1100;
-            --body-bg : #969aa5;
-            --play-bg : #dbdcf0;
+            --color-deepBlue : #4c9eff;
+            --body-bg : #dde4f0;
+            --play-bg : #f3f8ff;
             --color-light : #fff;
-            --color-shadow: #babecc;
-            --text-color : #616e7f;
-            --bar-bg : #aec9f8;
+            --color-shadow: #ccd0d5;
+            --text-color : #3a3a3c;
+            --bar-bg : #ffe480;
             --text-size : 30px;
         }
         body{
-            height: 100vh; background: linear-gradient( var(--pink) 0%, var(--violet) 100% );
+            height: 100vh; background: linear-gradient( var(--mint) 0%, var(--blue) 100% );
             display: flex; align-items: center; justify-content: center;
         }
         ul{ list-style: none; }
@@ -38,17 +37,20 @@
         .top > h2{
             font-size: var(--text-size); font-weight: 800; color: var(--text-color); text-align: center;
             text-shadow: 1px 1px 1px var( --color-light ), -1px -1px 1px var( --lightshadow );
+            letter-spacing: -1px;
         }
         .album{ height: 260px; border-radius: 12px; overflow: hidden; }
         .album > img{
             width: 100%; height: 100%; object-fit: cover; object-position: center bottom;
         }
         .info{
-            text-align: center; font-size: calc( var(--text-size) * 0.8 ); margin: calc( var(--text-size) * 0.5 );
+            text-align: center; font-size: calc( var(--text-size) * 0.8 ); 
+            margin: calc( var(--text-size) * 0.5 );
         }
+        .info > .name{ }
         .info > .artist{ font-size: calc( var(--text-size) * 0.6 ); }
         .progress{
-            height: 8px; border-radius: 8px; background: var(--play-bg);
+            height: 8px; border-radius: 8px; background: var(--play-bg); cursor: pointer;
             box-shadow: 2px 2px 2px 0 var( --color-shadow ) inset , -2px -2px 2px 0 var( --color-light) inset;
         }
         .progress > .bar{
@@ -74,24 +76,36 @@
             text-shadow: 1px 1px 0 var( --color-light);
         }
         .controls > span:hover, .controls > span:active{
-            color: var( --color-red );
+            color: var( --color-deepBlue );
             box-shadow: -3px -3px 5px 0 var( --color-light ) , 3px 3px 5px 0 var( --color-shadow );
         }
+        .controls > #listBtn.mute,
+        .controls > #repeatBtn.mute {
+            color: var(--color-deepBlue);
+        }
+
         .play_list{
-            position: absolute; width: 300px; min-height: 350px; background: #000; display: none;
+            position: absolute; width: 300px; min-height: 370px; background: #000; display: none;
             left: 30px; top: 110px; color: var(--color-light); padding: 20px; box-sizing: border-box;
+            border-radius: 20px;
         }
         .play_list.active{ display: block; }
         .play_list li{
             border-bottom: 1px solid var(--color-light); font-size: 16px; letter-spacing: -1px; 
             padding: 5px 0; display: flex; justify-content: space-between; align-items: flex-end;
         }
-        .play_list li.on{ color: #fc0; font-weight: bold; }
-        .play_list li strong{ font-weight: normal;}
-        .play_list li span{ font-size: 12px;}
+        .play_list li.on{ color: #00d4b0; font-weight: bold; }
+        .play_list li strong{ font-weight: normal; width: 65%;}
+        .play_list li span{ font-size: 12px; width: 28%; text-align: right; padding-right: 2px;}
+        .play_list li > strong, .play_list li > span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
 
         #volumeBtn.active {
-            color: var(--color-red);
+            color: var(--color-deepBlue);
             box-shadow: -3px -3px 5px 0 var(--color-light), 3px 3px 5px 0 var(--color-shadow);
         }
         #volume_ctrl { 
@@ -101,9 +115,11 @@
             display: none;
         }
         #volume_ctrl.active { display: block;}
+        #volumeBtn.mute { color: var(--color-deepBlue); }
         #volume_ctrl > .volume_bg { 
-            background: var(--bar-bg); width: 150px; height: 40px; border-radius: 20px;
+            background: #ffe480; width: 150px; height: 40px; border-radius: 20px;
             display: flex; justify-content: center; align-items: center;
+            box-shadow: -5px 5px 10px 0 #ccc
         }
     </style>
 </head>
@@ -131,11 +147,11 @@
             </div>
         </div>
         <div class="controls">
-            <span id="repeatBtn" class="material-icons">repeat</span>
+            <span id="listBtn" class="material-icons">queue_music</span>
             <span id="prevBtn" class="material-icons">skip_previous</span>
             <span id="playBtn" class="material-icons">play_arrow</span> <!-- pause -->
             <span id="nextBtn" class="material-icons">skip_next</span>
-            <span id="listBtn" class="material-icons">queue_music</span>
+            <span id="repeatBtn" class="material-icons">repeat</span>
             <span id="volumeBtn" class="material-icons">volume_up</span>
             <div id="volume_ctrl">
                 <div class="volume_bg">
@@ -169,6 +185,7 @@
         const musicPause = ()=> {
             musicAudio.pause();
             playBtn.innerHTML = "play_arrow";
+            
         }
         playBtn.addEventListener('click', ()=>{
             ( playBtn.innerText === 'play_arrow' ) ? musicPlay() : musicPause();
@@ -235,10 +252,12 @@
                 case 'repeat':
                     repeatBtn.innerHTML = 'repeat_one';
                     repeatBtn.setAttribute('title', '한곡 반복');
+                    repeatBtn.classList.add('mute');
                     break;
                 case 'repeat_one':
                     repeatBtn.innerHTML = 'repeat';
                     repeatBtn.setAttribute('title', '전체 반복');
+                    repeatBtn.classList.remove('mute');
                     break;
             }
         });
@@ -262,8 +281,13 @@
         const listBtn = musicApp.querySelector('#listBtn');
         listBtn.addEventListener('click', ()=>{
             listBox.classList.toggle('active');
+            if (listBox.classList.contains('active')) {
+                listBtn.classList.add('mute');
+            } else {
+                listBtn.classList.remove('mute');
+            }
         });
-        const fragment = document.createDocumentFragment();     //가상 DOM개체
+        const fragment = document.createDocumentFragment();
         const listLoad = () =>{
             musicList.forEach( (music) => {
                 let li = document.createElement('li');
@@ -279,8 +303,6 @@
                     
                     loadMusic(list_index);
                     musicPlay();
-                    
-                    listBox.classList.remove('active');
                 });
 
                 fragment.appendChild(li);
@@ -337,15 +359,18 @@
             if (value === 0) {
                 volumeBtn.innerHTML = 'volume_off';
                 volumeBtn.setAttribute('title', '음소거');
+                volumeBtn.classList.add('mute');
             } else if (value <= 50) {
                 volumeBtn.innerHTML = 'volume_down';
                 volumeBtn.setAttribute('title', '작은 볼륨');
+                volumeBtn.classList.remove('mute');
             } else {
                 volumeBtn.innerHTML = 'volume_up';
                 volumeBtn.setAttribute('title', '큰 볼륨');
+                volumeBtn.classList.remove('mute');
             }
         });
         
     </script>
 </body>
-</html>;
+</html>
